@@ -12,7 +12,7 @@ export const useSocket = () => {
 
   useEffect(() => {
     if (!token) return;
-    socket.current = io('http://localhost:5000', {
+    socket.current = io( 'https://hacker-chat-backend.onrender.com/api', {
       auth: { token },
       transports: ['websocket', 'polling']
     });

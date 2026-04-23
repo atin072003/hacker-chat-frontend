@@ -1,35 +1,47 @@
 ﻿import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import io from 'socket.io-client';
-import { addMessage, updateMessageReactions, deleteMessage, updateMessageReadBy } from '../store/slices/chatSlice';
+import { addMessage, updateMessageReactions, deleteMessage, updateMessageReadBy, updateTyping } from '../store/slices/chatSlice';
 import { setOnlineUsers } from '../store/slices/authSlice';
 import toast from 'react-hot-toast';
 
 export const useSocket = () => {
   const socket = useRef(null);
   const dispatch = useDispatch();
-  const { token } = useSelector(state => state.auth);
+  const { token } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (!token) return;
-    socket.current = io( 'https://hacker-chat-backend.onrender.com/api', {
+
+    // Force secure long polling (works everywhere)
+    socket.current = io('https://hacker-chat-backend.onrender.com', {
       auth: { token },
-      transports: ['websocket', 'polling']
+      transports: ['polling'],
+      secure: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
     });
 
-    socket.current.on('connect', () => console.log('✅ Socket connected'));
+    socket.current.on('connect', () => {
+      console.log('✅ Socket connected via secure polling');
+    });
+
+    socket.current.on('connect_error', (err) => {
+      console.error('❌ Socket connection error:', err.message);
+      toast.error('Connection lost, reconnecting...');
+    });
+
     socket.current.on('new-message', (msg) => dispatch(addMessage(msg)));
     socket.current.on('user-status', ({ userId, status }) => dispatch(setOnlineUsers({ userId, status })));
     socket.current.on('user-typing', ({ userId, isTyping }) => dispatch(updateTyping({ userId, isTyping })));
     socket.current.on('message-read', ({ messageId, userId }) => dispatch(updateMessageReadBy({ messageId, userId })));
     socket.current.on('reaction-updated', ({ messageId, reactions }) => dispatch(updateMessageReactions({ messageId, reactions })));
-    socket.current.on('message-edited', ({ messageId, encryptedContent }) => {
-      // optional: implement edit in store
-    });
     socket.current.on('message-deleted', ({ messageId, chatId }) => dispatch(deleteMessage({ messageId, chatId })));
-    socket.current.on('connect_error', (err) => toast.error('Socket error'));
 
-    return () => socket.current?.disconnect();
+    return () => {
+      if (socket.current) socket.current.disconnect();
+    };
   }, [token, dispatch]);
 
   const sendMessage = (data) => socket.current?.emit('send-message', data);

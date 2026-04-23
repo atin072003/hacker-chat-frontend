@@ -55,12 +55,12 @@ const chatSlice = createSlice({
       } else {
         state.typingUsers = state.typingUsers.filter(id => id !== action.payload.userId);
       }
-    }
-  }
+    },
+  },
 });
 
-export const { 
-  setChats, setActiveChat, addMessage, setMessages, 
-  updateMessageReactions, updateMessageReadBy, deleteMessage, updateTyping 
+export const {
+  setChats, setActiveChat, addMessage, setMessages,
+  updateMessageReactions, updateMessageReadBy, deleteMessage, updateTyping
 } = chatSlice.actions;
 export default chatSlice.reducer;

@@ -1,0 +1,131 @@
+﻿@import "tailwindcss";
+
+:root {
+  --theme-primary: #00ff41;
+  --theme-secondary: #00b8ff;
+  --theme-bg: #0a0a0a;
+  --theme-cardBg: rgba(0,0,0,0.8);
+  --theme-text: #ffffff;
+  --theme-border: rgba(0,255,65,0.3);
+}
+
+* {
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+body {
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
+  font-family: 'Courier New', 'Fira Code', monospace;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Cyber background with scanlines */
+.cyber-bg {
+  position: relative;
+  background: var(--theme-bg);
+}
+.cyber-bg::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(0deg, rgba(0,255,65,0.02) 0px, rgba(0,255,65,0.02) 2px, transparent 2px, transparent 6px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Glassmorphism with Safari prefix */
+.glassmorphism {
+  background: var(--theme-cardBg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--theme-border);
+}
+
+.neon-enabled .glassmorphism {
+  box-shadow: 0 0 8px var(--theme-primary);
+}
+
+/* Neon text */
+.neon-text {
+  text-shadow: 0 0 5px var(--theme-primary), 0 0 10px var(--theme-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #111;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--theme-primary);
+  border-radius: 5px;
+}
+
+/* Glitch hover effect */
+.glitch-hover:hover {
+  animation: glitch 0.2s infinite;
+}
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-1px, 1px); }
+  40% { transform: translate(1px, -1px); }
+  60% { transform: translate(-1px, 0); }
+  80% { transform: translate(1px, 1px); }
+  100% { transform: translate(0); }
+}
+
+/* Hacker input */
+.hacker-input {
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--theme-border);
+  color: var(--theme-text);
+}
+.hacker-input:focus {
+  outline: none;
+  box-shadow: 0 0 8px var(--theme-primary);
+}
+
+/* Message bubble base */
+.message-bubble {
+  transition: all 0.2s;
+}
+
+/* Typing dots */
+.typing-dot {
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .glassmorphism {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .neon-text {
+    text-shadow: 0 0 3px var(--theme-primary);
+  }
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Text color override will be handled by ThemeProvider, but these defaults ensure readability */
+body, button, input, textarea, p, h1, h2, h3, h4, h5, h6, span, div {
+  color: var(--theme-text);
+}
+
+/* But keep some accents with theme primary */
+.text-green-500, .text-neon-green, a, .hacker-link {
+  color: var(--theme-primary);
+}
